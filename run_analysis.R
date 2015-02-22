@@ -59,16 +59,6 @@ s <- rbind(s_test, s_train)
 #give the subject vector a name
 names(s) <- 'subject'
 
-#create the variable that will form variable names
-header.names <- feat_mat[feat_idx,2]
-header.names <- gsub('^t', 'Time.', header.names)
-header.names <- gsub('^f', 'Frequency.', header.names)
-header.names <- gsub('BodyBody', 'Body', header.names)
-header.names <- gsub('Body', 'Body.', header.names)
-header.names <- gsub('-std()', '', header.names)
-header.names <- gsub('-mean()', '', header.names)
-header.names <- gsub('\\-[X|Y|Z]', '', header.names)
-header.names <- gsub('\\(\\)', '', header.names)
 
 #now label the data set with the descriptive variable names.
-names(x) <- header.names
+colnames(x) <- header.names
