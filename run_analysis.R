@@ -1,7 +1,13 @@
 # file fo the x_test dataset
 x_test_file <- './UCI HAR Dataset/test/X_test.txt'
+y_test_file <- './UCI HAR Dataset/test/y_test.txt'
+s_test_file <- './UCI HAR Dataset/test/subject_test.txt'
 #file for the x train dataset
 x_train_file <- './UCI HAR Dataset/train/X_train.txt'
+y_train_file <- './UCI HAR Dataset/train/y_train.txt'
+s_train_file <- './UCI HAR Dataset/train/subject_train.txt'
+#labelling description file
+act_desc_file <- './UCI HAR Dataset/activity_labels.txt'
 
 # read the content of the x test dataset file using the scan function
 x_test_vec <- scan(x_test_file, what=numeric())
@@ -29,4 +35,40 @@ meanorstd <- grepl('mean()', feat_mat[,2]) | grepl('std()', feat_mat[,2])
 feat_idx <- feat_mat[meanorstd,1]
 
 # Extracts only the measurements on the mean and standard deviation for each measurement in x
-x_extract <- x[,feat_idx]
+x <- x[,feat_idx]
+
+## get the test and training class labels
+y_test <- read.csv(y_test_file, header=FALSE)
+y_train <- read.csv(y_train_file, header=FALSE)
+##merge both into one data label set
+y <- rbind(y_test, y_train)
+
+#read the activity label into act_label
+act_label <- read.csv(act_desc_file, header = FALSE, sep = ' ')
+
+#merge y and act_label to form a labelled classification matrix
+y_label <- merge(y, act_label, by.x='V1', by.y='V1')
+#give the variables a good name
+names(y_label) <- c('activity.code','activity.desc')
+
+
+#read the subject test and training dataset 
+s_test <- read.csv(s_test_file, header = FALSE)
+s_train <- read.csv(s_train_file, header = FALSE)
+s <- rbind(s_test, s_train)
+#give the subject vector a name
+names(s) <- 'subject'
+
+#create the variable that will form variable names
+header.names <- feat_mat[feat_idx,2]
+header.names <- gsub('^t', 'Time.', header.names)
+header.names <- gsub('^f', 'Frequency.', header.names)
+header.names <- gsub('BodyBody', 'Body', header.names)
+header.names <- gsub('Body', 'Body.', header.names)
+header.names <- gsub('-std()', '', header.names)
+header.names <- gsub('-mean()', '', header.names)
+header.names <- gsub('\\-[X|Y|Z]', '', header.names)
+header.names <- gsub('\\(\\)', '', header.names)
+
+#now label the data set with the descriptive variable names.
+names(x) <- header.names
